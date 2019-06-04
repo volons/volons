@@ -1,8 +1,8 @@
-# Volons (Alpha)
+### Volons (Alpha)
+    Volons is still early access alpha software, use at your own risk.
 
-Volons is still early access alpha software, use at your own risk.
+***
 
-kk
 # Volons - Get Started
 __Open Source Internet of Drone Plateform__
 
@@ -72,7 +72,7 @@ This sofware helps you to init, run and monitor volons local plateform.
 Volons local stack is composed by 4 docker images. Volons CLI executes docker-compose and docker commands to handle volons' containers. First, `volons init` generates a docker-compose.yml and save it.
 Then, `volons start` runs `docker-compose up` to start containers with docker. If you are familiar with docker, you can download Volons' container images directly from [Dockerhub](https://hub.docker.com/u/volons) and configure more complecated stack. Add many Fleet Mangment System and drones. Docker images are built from Volons' [repositories (github.com)](https://github.com/volons/).
 
-![volons start](./images/volons-start.gif)
+![volons start](./images/volons-get-started.gif)
 
 Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to takeoff.
 
