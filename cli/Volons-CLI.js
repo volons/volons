@@ -5,7 +5,7 @@
 // This sofware is used to generate docker-compose.yml for Volons' docker containers.
 // It helps the user to create files within an interactive command line interface.
 // Supported features:
-// - Generate Volons' docker-compose.yml
+// - Generate Volons' docker-compose.yml ( WIP )
 // - Start / Stop containers
 // - Print useful information about running containers
 // - Open default web-browser with Fleet Monitor
@@ -15,7 +15,6 @@
 
 const exec = require( 'executive' );
 const fs = require( 'fs' );
-const crypto = require( 'crypto' );
 const YAML = require( 'json2yaml' );
 
 const DockerCompose = require( './DockerCompose.js' );
@@ -42,7 +41,7 @@ let dockerFilePath = '';
 let useGlobalDir = true; // default
 
 const initSequence = function( entryVal, dockerCompose, droneCounter ) {
-    let adminToken = crypto.randomBytes( 32 ).toString('hex');
+    let adminToken = Math.random().toString(36).substr(2); // Generate random ID string (like 'qs8x53qb3u')
 
     if ( entryVal === '' ) {
         p.info( `Create Volons configuration with generated token:` );
