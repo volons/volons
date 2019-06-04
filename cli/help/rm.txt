@@ -1,0 +1,8 @@
+
+Remove Project From Project List
+================================
+This command remvoves Volons' project from project list.
+And delete volons-docker-compose.yml file.
+Use `volons ls` to list projects and use `volons rm [Project_ID]` to delete an unused project.
+
+Read more about Volons: https://wwww.nodejs.org/package/volons

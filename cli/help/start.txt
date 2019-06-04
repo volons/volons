@@ -1,0 +1,13 @@
+
+Start Volons' Containers
+========================
+This program starts containers created with `volons init`.
+This program uses the docker-compose command.
+
+Docker and docker-compose have to be installed before running this command.
+You should have executed `volons init` to generate a volons-cocker-compose.yml in current directory.
+Use `volons init -g` if you want to use global directory and use `volons start -g` from any directory to start containers.
+
+Execute `volons ps [-g]` to print useful information about running containers.
+
+Read more about Volons: https://wwww.nodejs.org/package/volons

@@ -1,19 +1,21 @@
 {
   "name": "volons",
-  "version": "1.0.1",
-  "description": "Everything you need to start coding for UAVs",
+  "version": "1.0.5",
+  "description": "Open Source Internet Of Drone Platform",
   "main": "index.js",
   "scripts": {
-    "test": "none"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/volons/volons.git"
+  "bin": {
+    "volons": "cli/Volons-CLI.js"
   },
-  "author": "",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/volons/volons/issues"
-  },
-  "homepage": "https://github.com/volons/volons#readme"
+  "author": "Volons SAS - Arthur Kubenka, Vincent Karoubi",
+  "license": "MIT",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "executive": "^1.6.3",
+    "isomorphic-ws": "^4.0.1",
+    "json2yaml": "^1.1.0",
+    "ws": "^6.1.2"
+  }
 }

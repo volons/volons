@@ -1,0 +1,11 @@
+
+List Volons' Containers
+=======================
+Print useful information about containers created and started with respectively:
+ - `volons init [-g]`
+ - `volons start [-g]`
+
+This program wrap `docker-compose ps` and `docker inspect` commands.
+Docker and docker-compose have to be installed. Docker deamon has to be started.
+
+Read more about Volons: https://wwww.nodejs.org/package/volons

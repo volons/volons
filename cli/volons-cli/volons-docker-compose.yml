@@ -1,0 +1,12 @@
+version: "3"
+services:
+  simulator:
+    image: 'volons/simulator'
+    stdin_open: true
+    tty: true
+  vehicle-mavlink:
+    image: 'volons/vehicle-mavlink'
+  hive:
+    image: 'volons/hive'
+    ports:
+      - 8656:8656

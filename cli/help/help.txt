@@ -1,0 +1,15 @@
+
+Volons Command Line Interface
+=============================
+This program helps you to generate docker containers to start managing drone fleet with docker.
+
+Available commands:
+ - `volons start`: Start all containers you've created with `volons init`
+ - `volons ps`: Print helpful information about running containers
+ - `volons stop`: Stop all volons' running containers.
+ - `volons monitor`: Open default web browser to connect Fleet Management System web application monitor
+ - `volons help`: Print this message
+
+To uninstall volons node module run: `npm uninstall volons`
+
+Read more about Volons: https://wwww.nodejs.org/package/volons

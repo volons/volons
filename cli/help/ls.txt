@@ -1,0 +1,7 @@
+
+List Volons' Projects
+=====================
+Print local project created with `volons init`
+To remove/delete a project: `volons rm [Projec ID]`, ex: `volons rm 45cad2a3a37c26e6`
+
+Read more about Volons: https://wwww.nodejs.org/package/volons

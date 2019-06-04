@@ -1,0 +1,10 @@
+
+Init Volons Container
+=====================
+This program helps you to create and configure Volons' volons-cocker-compose.yml.
+You can update the configuration be running `volons init [-g]` at any time.
+This command overrides the existing previous volons-cocker-compose.yml if it exists.
+
+Read more about Volons: https://wwww.nodejs.org/package/volons
+
+Press CTRL+C to exit.

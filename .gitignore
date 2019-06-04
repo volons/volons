@@ -1,3 +1,6 @@
+# Volons CLI Local Data
+cli/volons-cli/*.json
+
 # Logs
 logs
 *.log
