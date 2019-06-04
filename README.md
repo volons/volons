@@ -2,6 +2,7 @@
 
 Volons is still early access alpha software, use at your own risk.
 
+kk
 # Volons - Get Started
 __Open Source Internet of Drone Plateform__
 
@@ -56,7 +57,7 @@ Its are probably already installed. If not, you should do it before to continue.
 Volons node module comes with a command line interface.
 To install Volons CLI execute
 
-    npm install -g volons
+    $ npm i -g volons
 
 This sofware helps you to init, run and monitor volons local plateform.
 
@@ -66,29 +67,12 @@ This sofware helps you to init, run and monitor volons local plateform.
 - `volons monitor`: open default web browser with Fleet Management System Monitor URL ( and print this URL )
 - `volons help`: print help message How to use volons CLI
 
-By default `volons [command]` works in the current working directory. You can use '-g' after the command to use the volons' npm global directory. This options is availlable for `volons init -g`, `volons start -g` and `volons stop -g`.
-
 **How it works**
 
 Volons local stack is composed by 4 docker images. Volons CLI executes docker-compose and docker commands to handle volons' containers. First, `volons init` generates a docker-compose.yml and save it.
 Then, `volons start` runs `docker-compose up` to start containers with docker. If you are familiar with docker, you can download Volons' container images directly from [Dockerhub](https://hub.docker.com/u/volons) and configure more complecated stack. Add many Fleet Mangment System and drones. Docker images are built from Volons' [repositories (github.com)](https://github.com/volons/).
 
-**Google Map API key - Monitor required maps**
-
-`volons init` will ask you about a 'personal Google Map API key'. This API key is used to display drones on a map. The monitor implements features using the Google Map JavaScript API but quotas is limited.
-We recommend you to [get your personal Google Map API Key](https://developers.google.com/maps/documentation/javascript/get-api-key), and activate this APIs.
-1. Maps Elevation API
-1. Maps Static API
-1. Maps JavaScript API
-
-**Get started: Init and start Volons containers**
-
-> We recommand to use the '-g' if you have only one projet.
-
-    $ volons init -g
-    $ volons start -g
-
-![volons init -g](./images/volons-init--g.gif)
+![volons start](./images/volons-start.gif)
 
 Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to takeoff.
 
