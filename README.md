@@ -76,7 +76,7 @@ Then, `volons start` runs `docker-compose up` to start containers with docker. I
 
 Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to takeoff.
 
-### Connect Hive
+### Start New Project, Connect Hive
 
 Create new folder to store your first mission with Volons.
 
@@ -85,31 +85,21 @@ Create new folder to store your first mission with Volons.
 
 Init a Nodejs project add Volons npm, and copy takeoff.js sample code from volons sample code folder.
 
-    $ npm init
     $ npm install volons --save
-    $ cp ./node_modules/volons/examples/Takeoff.js ./Takeoff.js
+    $ cp ./node_modules/volons/examples/takeoff.js ./takeoff.js
 
 takeoff.js is a trival sample code. Edit Takeoff.js file to add your personal Token created by `volons init`.
 
+    $ cat ./takeoff.js
 ```javascript
 // This Volons script is a trivial script that
-// - Connect a drone through Volons' FleetManagementSystem stack
-// - Send ARM and TAKEOFF
-// - Wait end of takeoff command
-// - land
+// - require Volons' library
+// - connect Hive
+// - connect Drone
+// - Send Takeoff command to the Drone
 
 const volons = require( 'volons );
-const _ADMIN_TOKEN_ = '0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF' // Set your token here.
-// TOBE implemented.
 ```
-
-Open the monitor to watch drone and mission execution
-
-    volons monitor
-
-Finaly, execute your mission
-
-    node ./takeoff.js
 
 __Get more examples__
 
@@ -123,7 +113,6 @@ __Get more examples__
 > * events.js: Use `events` to connect drone's events, this demo shows how to post a message on a slack channel when the drone is landed
 
 Then you are able to code and connect your own program using the Volons SDK.
-
 
 ### Docker images
 
@@ -140,11 +129,9 @@ This command print usefull information about running volons container on your co
 
 --------------------
 
-
     > git clone volons/px4-simulator
-    > git clone volons/fms
-    > git clone volons/volons-cli
-    > cd volons-cli
+    > git clone volons/hive
+    > git clone volons/volons
     > docker-compose up
 
 Volons comes with an all-in-one docker-compose project.
