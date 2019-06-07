@@ -1,4 +1,4 @@
-const volons = require( 'volons' );
+const Hive = require('./lib/hive.js');
+const Mission = require('./lib/mission.js');
 
-volons.printMsg();
-console.log( 'here' );
+module.exports = { Hive, Mission };
