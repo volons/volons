@@ -1,10 +1,10 @@
 __Volons is still early access alpha software, use at your own risk.__
 
-![volons](./images/volons.jpg)
+![volons](https://github.com/volons/volons/raw/master/images/volons.jpg)
 
 Open Source Internet of Drones Plateform
 
-```javascript
+```js
 import {Hive} from 'volons';
 
 (async function main() {
@@ -40,7 +40,7 @@ __Main components__:
 
 Volons' API is object-oriented and easy to install, use and run.
 
-![Volons software architechure](./images/archi.png)
+![Volons software architechure](https://github.com/volons/volons/raw/master/images/archi.png)
 
 Let's start. You don't need to know everything about Volons at this point.
 You can get more information by browsing [Volons' github repository](https://github.com/volons/) and [Volons WIKI](https://github.com/volons/volons/wiki).
@@ -85,7 +85,7 @@ _Volons CLI arguments_:
 Volons local stack is composed by 4 docker images. Volons CLI executes docker-compose and docker commands to handle volons' containers. First, `volons start` downloads 3 images from Docker Hub.
 Then, by running `docker-compose up` to start containers with docker. If you are familiar with docker, you can download Volons' container images directly from [Dockerhub](https://hub.docker.com/u/volons) and configure more complecated stack. Add many hives and drones. Volons docker images are automaticly build from github sources.
 
-![volons start](./images/volons-get-started.gif)
+![volons start](https://github.com/volons/volons/raw/master/images/volons-get-started.gif)
 
 Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to start your firs mission.
 
@@ -154,83 +154,26 @@ __Get more examples__
 > * events.js: Use `events` to connect drone's events, this demo shows how to post a message on a slack channel when the drone is landed (comming soon).
 
 ## Docker Images
-
-If you want to handle volons images and containers manualy. 
+You can handle volons images and containers manualy. 
 
 ```
 $ docker pull volons/hive
 $ docker run -i volons/hive
 ```
 
-Volons comes with an all-in-one docker-compose project.
-Start cloning volons projects from GitHub and then start containers in a glance.
+or 
 
-Within another console, execute `> docker ps`
+```
+$ docker-compose -f ./node_modules/volons/cli/volons-cli/volons-docker-compose.yml up
+```
 
-![docker ps](./images/docker-ps.png)
+Volons CLI could help a lot: `$ volons start` is quite eq. to docker-compose command line.
 
-* *drone-1*: docker-compose starts a px4 drone simulator
-* *px4-simulator*: Gazebo based docker image with custom Volons configuration
-* *px4-vehicle*: the embedded software to connect drone with MAVLink
-* *FleetManagmentSystem*: connect drone and SDK to manage fleet security
-
-Volons' 4 docker images are ready to work collectively.
-
-
-## Volons API For Nodejs
-
-### Starter Scripts
-
-You can write and run your nodejs script to connect UAVs from scratch, but you should use 'starter script' to learn Volons' basics.
-
-Let's go through an example:
-
-    $ npm i
-    $ node takeoff.js
-
-This program is going to connect the FMS with the Volons javascript API.
-Then it waits for drone connections; the docker image: `drone-1` is configured to connect the same FMS.
-`drone-1` takeoffs and climbs to 20 meters then land.
-
-This is a very trivial mission.
-Starter scripts directory:
-
-
-* takeoff.js: Trivial mission to `Takeoff` ( the one we've just talk about )
-* mission.js: Demo of `mission.goto()` and manage air lift
-* weather.js: Connect real-time weather API as a condition to takeoff
-* events.js: Use `events` to connect drone's events, this demo shows how to post a message on a slack channel when the drone is landed
-
-### npm i volons
-
-Get technical information about Volons API to write an advanced program using aircraft.
 
 * [npmjs.org/volons](https://www.npmjs.com/package/volons)
 * [Volons API Documentation](https://api.volons.fr)
 * [github.com/volons/npm](https://api.volons.fr)
 
-
-```javascript
-import {Hive} from 'volons';
-
-async function main() {
-    let hive = new Hive( 'ws://localhost:8081/admin' );
-    await hive.connect();
-
-    console.log('connected to hive');
-
-    let vehicle = hive.vehicle( 'dev' );
-    await vehicle.connect();
-
-    console.log('connected to vehicle');
-
-    console.log('takeoff');
-    await vehicle.takeoff();
-    console.log('in air');
-}
-
-main().catch( ( err ) => console.error( err ) );
-```
 
 ## Monitor
 The `volons/simulator` docker image should connect to your local [QGroundControl](https://github.com/mavlink/qgroundcontrol).
