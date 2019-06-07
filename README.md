@@ -1,6 +1,6 @@
 __Volons is still early access alpha software, use at your own risk.__
 
-![volons](https://github.com/volons/volons/tree/master/images/volons.jpg)
+![volons](./images/volons.jpg)
 
 ```javascript
 import {Hive} from 'volons';
@@ -207,7 +207,6 @@ Get technical information about Volons API to write an advanced program using ai
 * [Volons API Documentation](https://api.volons.fr)
 * [github.com/volons/npm](https://api.volons.fr)
 
-You'll find helpful information from the [community](https://community.volons.fr).
 
 ```javascript
 import {Hive} from 'volons';
