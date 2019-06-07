@@ -1,6 +1,6 @@
-### Volons (Alpha)
-    Volons is still early access alpha software, use at your own risk.
-***
+__Volons is still early access alpha software, use at your own risk.__
+
+![volons](https://github.com/volons/volons/tree/master/images/volons.jpg)
 
 ```javascript
 import {Hive} from 'volons';
