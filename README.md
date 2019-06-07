@@ -1,17 +1,36 @@
 ### Volons (Alpha)
     Volons is still early access alpha software, use at your own risk.
-
 ***
 
-# Volons - Get Started
-__Open Source Internet of Drone Plateform__
+```javascript
+import {Hive} from 'volons';
+
+(async function main() {
+    let hive = new Hive( 'ws://localhost:8656/admin' );
+    await hive.connect();
+    let vehicle = hive.vehicle( 'dev' );
+    await vehicle.connect();
+    await vehicle.takeoff();
+})();
+```
+
+## Running local stack
+```
+$ npm i -g volons
+$ volons start
+```
+
+## Installation
+```
+$ npm i volons
+```
+
+## Volons: Open Source Internet of Drone Plateform
 
 Volons is composed of 4 main opensource software. You can download source code, install and run it manually.
 We build docker images for you to go strait-forward to the interesting part: __Coding and connecting mission for UAVs__.
 
 __Main components__:
-
-
 1. **Vehicles** ( px4 / dji ) are components directly connected to the flight controller
 1. **Hive** is backend application managing security and authorizations
 1. **Monitor** is a web application using Volons Javascript SDK to watch and control flights in real-time
@@ -22,27 +41,20 @@ Volons' API is object-oriented and easy to install, use and run.
 ![Volons software architechure](./images/archi.png)
 
 Let's start. You don't need to know everything about Volons at this point.
-You can get more information by browsing Volons' [github repository](https://github.com/volons/).
+You can get more information by browsing [Volons' github repository](https://github.com/volons/) and [Volons WIKI](https://github.com/volons/volons/wiki).
 
-This document presents a step-by-step tutorial and explanations on how to start coding for drones.
+This document presents a step-by-step tutorial and short explanations on how to start coding for drones.
 
-- [Install and init Volons on your computer](#install-and-init-local-volons-developer-stack)
+- [Install and start Volons on your computer](#install-and-start-local-volons-developer-stack)
 - [Write your fist program this Volons Javascript SDK](#volons-sdk-for-nodejs)
-- [Monitor mission](#run-and-monitor-simulator)
-
-Second part ( advanced ):
-
-- [Advanced Volons API Features](#advanced-api-features)
-- [Connect aircrafts](#connect-aircrafts)
-- [Install and host Volons for production](#install-and-host-volons)
+- [Run and monitor mission](#run-and-monitor-simulator)
 
 You are familiar with **Nodejs** and **Docker**! So, you are going to install your development platform then takeoff and monitor a px4-simulator in ~20 minutes.
 
 
-## Install And Init Local Volons Developer Stack
+## Install And Start Local Volons Developer Stack
 
 ### Requirements
-
 You need standard third-party software to run Volons.
 
 - Node.js with npm [https://nodejs.org](https://nodejs.org)
@@ -53,86 +65,100 @@ You need standard third-party software to run Volons.
 Its are probably already installed. If not, you should do it before to continue.
 
 ### Volons Command Line Interface
-
-Volons node module comes with a command line interface.
-To install Volons CLI execute
+Volons node module comes with a command line interface (CLI). To install Volons CLI run:
 
     $ npm i -g volons
 
-This sofware helps you to init, run and monitor volons local plateform.
+This sofware helps you to start Volons' local plateform.
 
-- `volons start`: start volons containers you've just create with `volons init`
+_Volons CLI arguments_:
+- `volons start`: start volons containers (Hive, simulator, vehicle-mavlinl)
 - `volons stop`: stop volons running containers
 - `volons ps`: print usefull information about running containers (ip address, ports, name, env...)
-- `volons monitor`: open default web browser with Fleet Management System Monitor URL ( and print this URL )
 - `volons help`: print help message How to use volons CLI
+- `volons pull`: Download latest docker images from [Docker Hub](https://cloud.docker.com/u/volons/repository/list) 
 
 **How it works**
 
-Volons local stack is composed by 4 docker images. Volons CLI executes docker-compose and docker commands to handle volons' containers. First, `volons init` generates a docker-compose.yml and save it.
-Then, `volons start` runs `docker-compose up` to start containers with docker. If you are familiar with docker, you can download Volons' container images directly from [Dockerhub](https://hub.docker.com/u/volons) and configure more complecated stack. Add many Fleet Mangment System and drones. Docker images are built from Volons' [repositories (github.com)](https://github.com/volons/).
+Volons local stack is composed by 4 docker images. Volons CLI executes docker-compose and docker commands to handle volons' containers. First, `volons start` downloads 3 images from Docker Hub.
+Then, by running `docker-compose up` to start containers with docker. If you are familiar with docker, you can download Volons' container images directly from [Dockerhub](https://hub.docker.com/u/volons) and configure more complecated stack. Add many hives and drones. Volons docker images are automaticly build from github sources.
 
 ![volons start](./images/volons-get-started.gif)
 
-Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to takeoff.
+Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to start your firs mission.
 
-### Start New Project, Connect Hive
+View running containers:
+```
+$ volons ps
+```
+This command diplays usefull information about Volons containers on your local computer.
 
-Create new folder to store your first mission with Volons.
+You should see 3 running containers:
+* *simulator*: [Dronekit-SITL](https://github.com/dronekit/dronekit-sitl) based docker image with custom Volons configuration
+* *vehicle-mavlink*: the Volons adaptor for MAVLink vehicles (Arducupter)
+* *hive*: the Fleet Management System to connect drone and SDK
+
+
+### Use Volons node module to write code for drones with nodejs
+
+Create new folder to store your first program using Volons.
 
     $ mkdir first-project-with-volons
     $ cd first-project-with-volons
 
-Init a Nodejs project add Volons npm, and copy takeoff.js sample code from volons sample code folder.
+Init a Nodejs project and install Volons package. Copy takeoff.js sample code from volons sample code folder.
 
     $ npm install volons --save
     $ cp ./node_modules/volons/examples/takeoff.js ./takeoff.js
 
-takeoff.js is a trival sample code. Edit Takeoff.js file to add your personal Token created by `volons init`.
+takeoff.js is a trival sample code.
 
     $ cat ./takeoff.js
 ```javascript
 // This Volons script is a trivial script that
 // - require Volons' library
 // - connect Hive
-// - connect Drone
-// - Send Takeoff command to the Drone
+// - connect aircraft
+// - Send Takeoff command to drone
 
-const volons = require( 'volons );
+const { Hive } = require('volons');
+
+async function main() {
+    let hive = new Hive('ws://localhost:8656/admin');
+    await hive.connect();
+
+    console.log('Connected to hive');
+
+    let vehicle = hive.vehicle('dev');
+    await vehicle.connect();
+
+    console.log('Connected to vehicle');
+
+    console.log('takeoff');
+    await vehicle.takeoff();
+    console.log('Dev is flying');
+}
 ```
 
 __Get more examples__
 
-> Browse the volons sample code directory to get more examples.
+> Browse the [volons sample code directory](https://github.com/volons/volons/tree/master/examples) to get more examples.
 
     $ ls ./node_modules/volons/examples/
 
-> * takeoff.js: Trivial mission to `Takeoff` ( the one we've just talk about )
-> * mission.js: Demo of `mission.goto()` and manage air lift
-> * weather.js: Connect real-time weather API as a condition to takeoff
-> * events.js: Use `events` to connect drone's events, this demo shows how to post a message on a slack channel when the drone is landed
+> * takeoff.js: Trivial mission to `Takeoff`. The one we've just talk about.
+> * mission.js: Demo of `mission.goto()` and manage air lift (comming soon).
+> * weather.js: Connect real-time weather API as a condition to takeoff (comming soon).
+> * events.js: Use `events` to connect drone's events, this demo shows how to post a message on a slack channel when the drone is landed (comming soon).
 
-Then you are able to code and connect your own program using the Volons SDK.
+## Docker Images
 
-### Docker images
+If you want to handle volons images and containers manualy. 
 
-After running volons with `volons start`, you can execute 
-
-    volons ps
-
-This command print usefull information about running volons container on your computer.
-
-* *drone-1*: docker-compose starts a px4 drone simulator
-* *px4-simulator*: Gazebo based docker image with custom Volons configuration
-* *px4-vehicle*: the embedded software to connect drone with MAVLink
-* *FleetManagmentSystem*: connect drone and SDK to manage fleet security
-
---------------------
-
-    > git clone volons/px4-simulator
-    > git clone volons/hive
-    > git clone volons/volons
-    > docker-compose up
+```
+$ docker pull volons/hive
+$ docker run -i volons/hive
+```
 
 Volons comes with an all-in-one docker-compose project.
 Start cloning volons projects from GitHub and then start containers in a glance.
@@ -157,20 +183,16 @@ You can write and run your nodejs script to connect UAVs from scratch, but you s
 
 Let's go through an example:
 
-    > git clone volons/starter-scripts
-    > cd starter-scripts
-    > npm i
-    > node takeoff.js
+    $ npm i
+    $ node takeoff.js
 
 This program is going to connect the FMS with the Volons javascript API.
 Then it waits for drone connections; the docker image: `drone-1` is configured to connect the same FMS.
 `drone-1` takeoffs and climbs to 20 meters then land.
 
 This is a very trivial mission.
-
-![takeoff.js](./images/takeoff.js.png)
-
 Starter scripts directory:
+
 
 * takeoff.js: Trivial mission to `Takeoff` ( the one we've just talk about )
 * mission.js: Demo of `mission.goto()` and manage air lift
@@ -210,77 +232,29 @@ main().catch( ( err ) => console.error( err ) );
 ```
 
 ## Monitor
+The `volons/simulator` docker image should connect to your local [QGroundControl](https://github.com/mavlink/qgroundcontrol).
 
-Open [http://localhost:13112/monitor/](http://localhost:13112/monitor) to watch you mission running.
-
-Monitor is a web app for supervision and FMS management.
-
-* Real-time UAVs geolocalisation and altitude rendering using Google Map API
-* Actions: `Stop`, `Start`, `Pause` and `Resume` mission
-* Take realtime controls: `Enter cockpit`
-* Mission preview waypoints and actions
-* Real-time webRTC video stream
-* Real-time telemetry
-
-
-This is the end of the fist part.
-You are now ready to connect drones with your API, extend mission's capabilities and implement alerts or custom triggers.
-
-__PART II__
-
-The second part introduces advanced features that you should be interested in too.
-You can write code though you want to connect real drones and run in production, don't you?
+_Coming soon_: Volons provides a web based application using the Volons SDK to display your Aircraft on a map with telemetry data.
 
 ## Connect Aircrafts
+You can find more information on our vehicle adaptors repositories:
 
-### PX4 ( MAVLink ) flight controller
+* _Mavlink aircrafts_: [https://github.com/volons/vehicle-mavlink](https://github.com/volons/vehicle-mavlink)
+* _DJI aircrafts_: [https://github.com/volons/vehicle-dji](https://github.com/volons/vehicle-dji)
 
-Volons comes with a px4-vehicle prebuild image for Raspberry Pi.
-Flash your SD card with Volons' image below and connect the controller to the serial port
-
-* Download Volons/px4-simulator image for RaspberryPI
-
-or download vehicl-px4 volons' source code: `git clone volons/vehicle-px4`
-
-Then, connect Raspberry Pi's GPIO to Flight Controler serial port. There is a picture using a RasperryPi2 and a Pixhawk.
-
-![Raspberry to Serial](/images/raspberry.png)
-
-[Communicating with Raspberry Pi via MAVLink](http://ardupilot.org/dev/docs/raspberry-pi-via-mavlink.html) or watch [Connecting Raspberry Pi w/ Pixhawk and Communicating via MAVLink Protocol](https://www.youtube.com/watch?v=DGAB34fJQFc) tutorial on Youtube.
-
-### DJI flight controller
-For DJI drones, Volons comes with an Android JAVA native application to connect Volons. Download pre-build version on the PlayStore:
-
-- [Volons for Android](https://www.volons.fr/dji/)
-
-or build and run local Android App with volons/dji-vehicle: `git clone volons/vehicle-dji`
+Feel free to contact us to get help building software for your drones.
 
 
-## Volons To Production
+## MIT Licence
+Copyright (c) 2019 Volons SAS, https://www.volons.fr
 
-Volons Fleet Management System is dockerized, you can choose the hosting provider you want
-
-    docker clone volons/fms
-    docker run volons/fms
-
-* __AWS__: To deploy docker container to Amazon Web Services read: [Running Docker on AWS EC2](https://hackernoon.com/running-docker-on-aws-ec2-83a14b780c56) on Hackernoon.
-* __Azure__: To deploy docker container to Microsoft Azure read: [Run Docker containers with Azure Container Instances](https://docs.microsoft.com/en-us/learn/modules/run-docker-with-azure-container-instances/)
-* __OVH__: To deploy docker with OVH read: [Docker running on OVH VPS ](https://medium.com/sroze/docker-running-on-ovh-vps-ubuntu-14-04-2422228add2c)
-* __Clever-Cloud__: To deploy docker images with clever-cloud read: [Deploy Docker images](https://www.clever-cloud.com/doc/docker/docker/)
-
-Finaly, get help to deploy Volons from the [community](https://community.volons.fr/).
-
-
-## Licence
 
 ## Contact us
-
 Volons is developped and maintained by Volons SAS, based in France, contact us at __contact@volons.fr__
+
 
 __Usefull links:__
 
-* [Api documentation](https://api.volons.fr)
+* [Api documentation](https://github.com/volons/volons/wiki)
 * [NPM Volons](https://npm.volons.fr)
-* [Volons Community](https://community.volons.fr)
 * [Github](https://github.com/volons)
-
