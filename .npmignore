@@ -1,5 +1,4 @@
 images/
-lib/
 node_modules/
 index.js
 package-lock.json
