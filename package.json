@@ -1,6 +1,6 @@
 {
   "name": "volons",
-  "version": "1.0.73",
+  "version": "0.0.1",
   "description": "Open Source Internet Of Drone Platform",
   "main": "index.js",
   "scripts": {
