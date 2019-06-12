@@ -1,7 +1,7 @@
 const { Hive } = require('volons');
 
 async function main() {
-    let hive = new Hive('ws://localhost:8081/admin');
+    let hive = new Hive('ws://localhost:8656/admin');
     await hive.connect();
 
     console.log('connected to hive');
