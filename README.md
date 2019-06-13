@@ -38,7 +38,7 @@ $ volons start
 $ npm i volons
 ```
 
-## Volons: Open Source Internet of Drone Plateform
+## Volons: Open Source Internet of Drones Plateform
 
 Volons is composed of 4 main opensource software. You can download source code, install and run it manually.
 We build docker images for you to go strait-forward to the interesting part: __Coding and connecting mission for UAVs__.
