@@ -9,6 +9,7 @@
 
 __Volons is still early access alpha software, use at your own risk.__
 
+
 ![volons](https://github.com/volons/volons/raw/master/images/volons.jpg)
 
 Open Source Internet of Drones Plateform
@@ -152,6 +153,8 @@ async function main() {
     console.log('Dev is flying');
 }
 ```
+
+> [Watch the one minute video on Youtube: From 'npm install' to monitor takeoff](https://youtu.be/lVQzDrSL2Lg)
 
 __Get more examples__
 
