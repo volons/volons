@@ -16,6 +16,7 @@
 const exec = require( 'executive' );
 const fs = require( 'fs' );
 const YAML = require( 'json2yaml' );
+const path = require( 'path' );
 
 const DockerCompose = require( './DockerCompose.js' );
 
@@ -349,7 +350,8 @@ if ( args.length === 0 ) {
 else {
     // if ( args.length === 2 && args[ 1 ].toLowerCase() === '-g' ) {
         useGlobalDir = true;
-        dockerFilePath = x( `npm root -g`, { options: 'quiet', sync: true } ).stdout.trim() + '/volons/cli/volons-cli/';
+        //dockerFilePath = x( `npm root -g`, { options: 'quiet', sync: true } ).stdout.trim() + '/volons/cli/volons-cli/';
+        dockerFilePath = path.join( __dirname, './volons-cli/' );
     // }
     // else {
     //     useGlobalDir = false;
