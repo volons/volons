@@ -16,7 +16,7 @@ Open Source Internet of Drones Plateform
 
 
 ```js
-import {Hive} from 'volons';
+const { Hive } = require('volons');
 
 (async function main() {
     let hive = new Hive( 'ws://localhost:8656/admin' );
@@ -44,7 +44,7 @@ Volons is composed of 4 main opensource software. You can download source code, 
 We build docker images for you to go strait-forward to the interesting part: __Coding and connecting mission for UAVs__.
 
 __Main components__:
-1. **Vehicles** ( px4 / dji ) are components directly connected to the flight controller
+1. **Vehicles** ( arducopter / dji ) are components directly connected to the flight controller
 1. **Hive** is backend application managing security and authorizations
 1. **Monitor** is a web application using Volons Javascript SDK to watch and control flights in real-time
 1. **Volons Javascript SDK** is the part you are going to interact with to code dynamic missions and triggers
@@ -63,7 +63,7 @@ This document presents a step-by-step tutorial with short explanations on how to
 - [Use Volons node module to write code for drones with nodejs](#use-volons-node-module-to-write-code-for-drones-with-nodejs)
 - [Run and Monitor Mission](#run-and-monitor-mission)
 
-You are familiar with **Nodejs** and **Docker**! So, you are going to install your development platform then takeoff and monitor a px4-simulator in ~20 minutes.
+You are familiar with **Nodejs** and **Docker**! So, you are going to install your development platform then takeoff and monitor a simulator in ~5 minutes.
 
 
 ## Install And Start Local Volons Developer Stack
