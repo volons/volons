@@ -1,7 +1,6 @@
 const { Hive } = require('volons');
 
 async function main() {
-    //let hive = new Hive('ws://10.31.253.160:8656/admin');
     let hive = new Hive('ws://localhost:8656/admin');
     await hive.connect();
 
@@ -15,10 +14,12 @@ async function main() {
     await vehicle.takeoff();
     console.log('in air');
 
-
-    const wp = [{lat: -35.364258, lon: 149.163263, relAlt: 30},
-           {lat: -35.361879, lon: 149.161882, relAlt: 30},
-           {lat: -35.361537, lon: 149.165635, relAlt: 30}];
+    const wp = [ { lat: -35.363607, lon: 149.164680, relAlt: 20 },
+                 { lat: -35.362887, lon: 149.164158, relAlt: 20 },
+                 { lat: -35.362081, lon: 149.164247, relAlt: 40 },
+                 { lat: -35.361888, lon: 149.164670, relAlt: 60 },
+                 { lat: -35.362060, lon: 149.165042, relAlt: 45 },
+                 { lat: -35.362184, lon: 149.165076, relAlt: 30 } ];
 
     for ( let i = 0; i < wp.length; i++ ) {
         await vehicle.goto(wp[i].lat, wp[i].lon, wp[i].relAlt);
