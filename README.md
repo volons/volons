@@ -12,7 +12,7 @@ __Volons is still early access alpha software, use at your own risk.__
 
 ![volons](https://github.com/volons/volons/raw/master/images/volons.jpg)
 
-Open Source Internet of Drones Plateform
+Open Source Internet of Drones Platform
 
 
 ```js
@@ -38,15 +38,15 @@ $ volons start
 $ npm i volons
 ```
 
-## Volons: Open Source Internet of Drones Plateform
+## Volons: Open Source Internet of Drones Platform
 
-Volons is composed of 4 main opensource software. You can download source code, install and run it manually.
-We build docker images for you to go strait-forward to the interesting part: __Coding and connecting mission for UAVs__.
+Volons is composed of 4 leading opensource software. You can download the source code, install and run it manually.
+: __Coding and connecting mission for UAVs__.
 
 __Main components__:
-1. **Vehicles** ( arducopter / dji ) are components directly connected to the flight controller
-1. **Hive** is backend application managing security and authorizations
-1. **Monitor** is a web application using Volons Javascript SDK to watch and control flights in real-time
+1. **Vehicles** ( arducopter / DJI ) are components directly connected to the flight controller
+1. The **Hive** is the backend application managing security and authorizations
+1. The **Monitor** is a web application using Volons Javascript SDK to watch and control flights in real-time
 1. **Volons Javascript SDK** is the part you are going to interact with to code dynamic missions and triggers
 
 Volons' API is object-oriented and easy to install, use and run.
@@ -54,7 +54,7 @@ Volons' API is object-oriented and easy to install, use and run.
 ![Volons software architechure](https://github.com/volons/volons/raw/master/images/archi.png)
 
 Let's start. You don't need to know everything about Volons at this point.
-You can get more information by browsing [Volons' github repository](https://github.com/volons/) and [Volons WIKI](https://github.com/volons/volons/wiki) (Work in process)
+You can get more information by browsing [Volons' Github repositories](https://github.com/volons/) and [Volons WIKI](https://github.com/volons/volons/wiki) (Work in process).
 
 This document presents a step-by-step tutorial with short explanations on how to start coding for drones.
 
@@ -79,35 +79,40 @@ You need standard third-party software to run Volons.
 Its are probably already installed. If not, you should do it before to continue.
 
 ### Volons Command Line Interface
-Volons node module comes with a command line interface (CLI). To install Volons CLI run:
+Volons node module comes with a command line interface (CLI). To install the Volons CLI run:
 
     $ npm i -g volons
 
-This sofware helps you to start Volons' local plateform.
+This software helps you to start Volons' local platform.
 
 _Volons CLI arguments_:
-- `volons start`: start volons containers (Hive, simulator, vehicle-mavlinl)
-- `volons stop`: stop volons running containers
-- `volons ps`: print usefull information about running containers (ip address, ports, name, env...)
-- `volons help`: print help message How to use volons CLI
+- `volons start`: Start volons containers (Hive, simulator, vehicle-mavlinl)
+- `volons stop`: Stop volons running containers
+- `volons ps`: Print information about running containers (IP address, ports, name, env...)
+- `volons help`: Print help message How to use volons CLI
 - `volons pull`: Download latest docker images from [Docker Hub](https://cloud.docker.com/u/volons/repository/list)
 
 **How it works**
 
-Volons local stack is composed by 4 docker images. Volons CLI executes docker-compose and docker commands to handle volons' containers. First, `volons start` downloads 3 images from Docker Hub.
-Then, by running `docker-compose up` to start containers with docker. If you are familiar with docker, you can download Volons' container images directly from [Dockerhub](https://hub.docker.com/u/volons) and configure more complecated stack. Add many hives and drones. Volons docker images are automaticly build from github sources.
+Four docker images compose the Volons local stack.
+Volons CLI executes docker-compose and docker commands to handle volons' containers.
+First, `volons start` downloads three images from Docker Hub.
+Then, by running `docker-compose up` to start containers with docker.
+If you are familiar with docker, you can download Volons' container images directly from [Docker hub](https://hub.docker.com/u/volons) and configure more complicated stack.
+Add many hives and drones.
+Docker hub builds Volons docker images automatically from source code.
 
 ![volons start](https://github.com/volons/volons/raw/master/images/volons-get-started.gif)
 
-Your containers run all togather. Your local plateforme is ready and you can connect with de SDK to start your firs mission.
+Your containers run altogether. Your local platform is ready, and you can connect with the SDK to start your first mission.
 
 View running containers:
 ```
 $ volons ps
 ```
-This command diplays usefull information about Volons containers on your local computer.
+This command displays information about Volons containers on your local machine.
 
-You should see 3 running containers:
+You should see three running containers:
 * *simulator*: [Dronekit-SITL](https://github.com/dronekit/dronekit-sitl) based docker image with custom Volons configuration
 * *vehicle-mavlink*: the Volons adaptor for MAVLink vehicles (Arducupter)
 * *hive*: the Fleet Management System to connect drone and SDK
@@ -115,17 +120,17 @@ You should see 3 running containers:
 
 ## Use Volons node module to write code for drones with nodejs
 
-Create new folder to store your first program using Volons.
+Create a new folder to store your first program using Volons.
 
     $ mkdir first-project-with-volons
     $ cd first-project-with-volons
 
-Init a Nodejs project and install Volons package. Copy takeoff.js sample code from volons sample code folder.
+Init a Nodejs project and install Volons package. Copy Takeoff.js sample code from volons sample code folder.
 
     $ npm install volons --save
-    $ cp ./node_modules/volons/examples/takeoff.js ./takeoff.js
+    $ cp ./node_modules/volons/examples/Takeoff.js ./Takeoff.js
 
-takeoff.js is a trival sample code.
+Takeoff.js is a trival sample code.
 
     $ cat ./takeoff.js
 ```javascript
@@ -162,26 +167,25 @@ Browse the [volons sample code directory](https://github.com/volons/volons/tree/
 
     $ ls ./node_modules/volons/examples/
 
-* takeoff.js: Trivial mission to `Takeoff`. The one we've just talk about.
-* mission.js: Demo of `mission.goto()` and manage air lift (comming soon).
-* weather.js: Connect real-time weather API as a condition to takeoff (comming soon).
-* events.js: Use `events` to connect drone's events, this demo shows how to post a message on a slack channel when the drone is landed (comming soon).
+* Takeoff.js: Trivial mission to `Takeoff`. The one we've just talk about.
+* Goto.js: Demo of `vehicle.goto()`.
+* Events.js: Use `events` to connect drone's events, this demo prints drones telemetry.
 
 ## Docker Images
-You can handle volons images and containers manualy. 
+You can handle volons images and containers manually. 
 
 ```
 $ docker pull volons/hive
 $ docker run -i volons/hive
 ```
 
-or 
+or docker-compose
 
 ```
 $ docker-compose -f ./node_modules/volons/cli/volons-cli/volons-docker-compose.yml up
 ```
 
-Volons CLI could help a lot: `$ volons start` is quite eq. to docker-compose command line.
+Volons CLI could help a lot: `$ volons start` is entirely equivalent to the docker-compose command line.
 
 
 * [npmjs.org/volons](https://www.npmjs.com/package/volons)
@@ -193,7 +197,7 @@ Volons CLI could help a lot: `$ volons start` is quite eq. to docker-compose com
 
 The `volons/simulator` docker image should connect to your local [QGroundControl](https://github.com/mavlink/qgroundcontrol).
 
-_Coming soon_: Volons provides a web based application using the Volons SDK to display your Aircraft on a map with telemetry data.
+_Coming soon_: Volons provides a web-based application using the Volons SDK to display your Aircraft on a map with telemetry data.
 
 ## Connect Aircrafts
 You can find more information on our vehicle adaptors repositories:
@@ -209,7 +213,7 @@ Copyright (c) 2019 Volons SAS, https://www.volons.fr
 
 
 ## Contact us
-Volons is developped and maintained by Volons SAS, based in France, contact us!
+Volons is developed and maintained by Volons SAS, based in France, contact us!
 ![contact@volons.fr](https://img.shields.io/badge/email-contact%40volons.fr-informational.svg)
 
 
