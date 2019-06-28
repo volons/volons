@@ -29,10 +29,16 @@ const _DEFAULT_HOME_POSITION_ = '47.479219, 4.339885, 300';
 const _DOCKER_COMPOSE_FILENAME_ = 'volons-docker-compose.yml';
 
 // x: shortcut to exec command line sync and quiet
-const x = function( command ) { return exec.quiet( command, { sync: true } ); };
+const x = function( command ) {
+    return exec.quiet( command, { sync: true } );
+};
+
 // function to print Help message from file
-const helpFilePath = x( `npm root -g`, { options: 'quiet', sync: true } ).stdout.trim() + '/volons/cli/help/';
-const printHelp = function( helpFile ) { p.log( x( `cat ${ helpFilePath }${ helpFile }` ).stdout ); };
+const helpFilePath = x( 'npm root -g', { options: 'quiet', sync: true } ).stdout.trim() + '/volons/cli/help/';
+
+const printHelp = function( helpFile ) {
+    p.log( x( `cat ${ helpFilePath }${ helpFile }` ).stdout );
+};
 
 let dockerCompose = {};
 let stepNumber = 1;
@@ -85,46 +91,46 @@ const droneNameSequence = function( entryVal, dockerCompose, droneCounter ) {
     return 'END';
 };
 
-const homePositionSequence = function( entryVal, dockerCompose ) {
-    const match = ( entryVal !== '' ? entryVal : _DEFAULT_HOME_POSITION_ ).match( /^\d+(\.\d+)?, \d+(\.\d+)?, \d+(\.\d+)?$/ );
-    if ( match === null || match.index || match.index != 0 ) {
+const homePositionSequence = function( entryVal ) {
+    if ( entryVal !== '' ) {
+        entryVal = _DEFAULT_HOME_POSITION_;
+    }
+
+    let vals = entryVal.split( ', ' );
+
+    if ( vals === null || vals.length !== 3 || isNaN( vals[ 0 ] ) || isNaN( vals[ 1 ] ) || isNaN( vals[ 2 ] ) ) {
         // Home position dont match regular expression for position
-        p.error( `Error: '${ entryVal }': This location does't match a regular position : '[Latitude], [Longitude], [Altitude (meter}] string.` );
+        p.error( `Error: '${ entryVal }': This location does't match a regular position : '[Latitude], [Longitude], [Altitude (meter)] string.` );
         p.logNoCR( `Enter a valid location or press enter to use: '${ _DEFAULT_HOME_POSITION_ }' as default home position.` );
         return 'HOME_POSITION';
     }
 
-    const lat = match[ 0 ].split( ', ' )[ 0 ];
-    const lon = match[ 0 ].split( ', ' )[ 1 ];
-    const alt = match[ 0 ].split( ', ' )[ 2 ];
-
-    p.info( `Home position has been set to: latitude: ${ lat }, longitude: ${ lon }, altitude: ${ alt }.` );
-    dockerCompose.setDefaultHomePosition( lat, lon, alt );
+    p.info( `Home position has been set to: latitude: ${ vals[ 0 ] }, longitude: ${ vals[ 1 ] }, altitude: ${ vals[ 2 ] }.` );
+    dockerCompose.setDefaultHomePosition( vals[ 0 ], vals[ 1 ], vals[ 2 ] );
 
     p.logNoCR( `\n${ stepNumber++ }: Do you want to use a personal Google Map API with Monitor Web UI [Y/n]? ` );
     return 'USE_GMAP';
 };
 
-const useGMapSequence = function( entryVal, dockerCompose ) {
+const useGMapSequence = function( entryVal ) {
     if ( entryVal === '' || entryVal.toLowerCase() === 'yes' || entryVal.toLowerCase() === 'y' ) {
-        p.logNoCR( `Enter your Google Map API key (39 alpha numeric case-sensitive characters)': ` );
+        p.logNoCR( 'Enter your Google Map API key (39 alpha numeric case-sensitive characters): ' );
         return 'GMAP_API_KEY';
     }
 
     dockerCompose.setDefaultGoogleMapAPIkey();
 
-    p.warn( `/!\\ WARNINNG /!\\` );
-    p.warn( `The Monitor has been configured to use Volons' global Google Map API Key,` );
-    p.warn( `This API key is shared with all volons' users but have a very limited quotas.` );
-    p.warn( `If the map doesn't appeare correctly in the Monitor, we recommend to use a personal Google Map API Key.` );
+    p.warn( '/!\\ WARNINNG /!\\' );
+    p.warn( 'The Monitor has been configured to use Volons\' global Google Map API Key,' );
+    p.warn( 'This API key is shared with all volons\' users but have a very limited quotas.' );
+    p.warn( 'If the map doesn\'t appeare correctly in the Monitor, we recommend to use a personal Google Map API Key.' );
 
     return 'END';
 };
 
-const saveGMapAPIKeySequence = function( entryVal, dockerCompose ) {
-    // regexp to match GMapAPIKey
-    const match = ( entryVal !== '' ? entryVal : '' ).match( /^.{39}$/ );
-    if ( match === null || match.index || match.index != 0 ) {
+const saveGMapAPIKeySequence = function( entryVal ) {
+    // GMapAPIKey.length should be 39 chars string.
+    if ( entryVal === null || entryVal.length !== 39 ) {
         p.logNoCR( `The Google map API key:[${ entryVal }] is not valid. Do you want to use a personal Google Map API [Y/n] ? ` );
         return 'USE_GMAP';
     }
@@ -142,16 +148,17 @@ const init = function() {
     p.logNoCR( `${ stepNumber++ }: Enter your token or press enter to generate new token: ` );
 
     let sequence = 'INIT';
-    let droneCounter  = 1;
+    let droneCounter = 1;
 
     stdin.addListener( 'data', function( d ) {
         const entryVal = d.toString().trim();
+
         switch ( sequence ) {
             // case 'INIT' : sequence = initSequence( entryVal, dockerCompose, droneCounter ); break;
             case 'ADD_DRONE': sequence = addDroneSequence( entryVal, dockerCompose, droneCounter ); break;
             case 'DRONE_NAME': sequence = droneNameSequence( entryVal, dockerCompose, droneCounter ); break;
-            case 'HOME_POSITION': sequence = homePositionSequence( entryVal, dockerCompose, droneCounter ); break;
-            case 'USE_GMAP': sequence = useGMapSequence( entryVal, dockerCompose ); break;
+            case 'HOME_POSITION': sequence = homePositionSequence( entryVal ); break;
+            case 'USE_GMAP': sequence = useGMapSequence( entryVal ); break;
             case 'GMAP_API_KEY': sequence = saveGMapAPIKeySequence( entryVal, dockerCompose ); break;
             default: break;
         }
@@ -162,7 +169,10 @@ const init = function() {
             p.info( '\n\nVolons\' containers have been configured.' );
             p.log( `The ${ _DOCKER_COMPOSE_FILENAME_ } file has been saved to` );
             p.log( `${ dockerFilePath }${ _DOCKER_COMPOSE_FILENAME_ }\n` );
-            p.log( `Next: to start Volons\' docker container run \`volons start${ useGlobalDir ? ' -g' : '' }\`.\n` );
+            const msgGlobal = '';
+            if ( useGlobalDir )
+                msgGlobal = '-g';
+            p.log( `Next: to start Volons' docker containers run \`volons start${ msgGlobal }\`.\n` );
 
             fs.writeFileSync( `${ dockerFilePath }${ _DOCKER_COMPOSE_FILENAME_ }`, dockerCompose.toYML() );
             store.addDockerCompose( dockerCompose );
@@ -183,13 +193,13 @@ const start = function() {
         // Check if current docker-compose is allready started before.
         // let { stdout, stderr } = x( `docker inspect -f {{.State.Running}} volons-cli_fms_1` );
         // if ( stderr || stdout.trim() === 'false' ) {
-            p.warn( 'Entering docker-compose console (Press CTRL+C to kill all process)\n' );
+        p.warn( 'Entering docker-compose console (Press CTRL+C to kill all process)\n' );
 
-            exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } up`, err => { process.exit( 0 ); } );
-            // forward CTRL-C to docker-compose
-            process.on('SIGINT', function () {
-                exec.interactive( `cd ${ dockerFilePath };docker-compose kill -f ${ _DOCKER_COMPOSE_FILENAME_ } -s SIGINT`, err => { process.exit( 0 ); } );
-            });
+        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } up`, err => { process.exit( 0 ); } );
+        // forward CTRL-C to docker-compose
+        process.on('SIGINT', function () {
+            exec.interactive( `cd ${ dockerFilePath };docker-compose kill -f ${ _DOCKER_COMPOSE_FILENAME_ } -s SIGINT`, err => { process.exit( 0 ); } );
+        });
         // } else {
         //     p.info( 'Volons is already runing.' );
         // }
@@ -228,7 +238,7 @@ const monitor = function() {
 
     const monitorUrl = `http://${ dockerCompose.getIPAddress( 'fms' ) }:8181/`;
 
-    console.log( `Fleet Management System Monitor URL: ${ monitorUrl }` );
+        console.log( `Fleet Management System Monitor URL: ${ monitorUrl }` );
     exec.interactive( `open ${ monitorUrl }`, err => { process.exit( 0 ); } );
 };
 
@@ -344,23 +354,14 @@ const ps = function() {
 const args = process.argv.slice(2);
 
 if ( args.length === 0 ) {
-    // start Volons Fleet Management System container
     printHelp( 'help.txt' );
-}
-else {
-    // if ( args.length === 2 && args[ 1 ].toLowerCase() === '-g' ) {
-        useGlobalDir = true;
-        //dockerFilePath = x( `npm root -g`, { options: 'quiet', sync: true } ).stdout.trim() + '/volons/cli/volons-cli/';
-        dockerFilePath = path.join( __dirname, './volons-cli/' );
-    // }
-    // else {
-    //     useGlobalDir = false;
-    //     dockerFilePath = x( `pwd`, { options: 'quiet', sync: true } ).stdout.trim() + '/';
-    // }
+} else {
+    useGlobalDir = true;
+    dockerFilePath = path.join( __dirname, './volons-cli/' );
 
     dockerCompose = new DockerCompose( dockerFilePath + _DOCKER_COMPOSE_FILENAME_, store.getSubnetIpInc( dockerFilePath ) );
 
-    switch( args[ 0 ].toLowerCase() ) {
+    switch ( args[ 0 ].toLowerCase() ) {
         case 'help': printHelp( 'help.txt' ); break;
         case 'start': start(); break;
         case 'stop': stop(); break;

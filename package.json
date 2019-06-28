@@ -4,6 +4,7 @@
   "description": "Open Source Internet Of Drones Platform",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
@@ -16,5 +17,8 @@
     "isomorphic-ws": "^4.0.1",
     "json2yaml": "^1.1.0",
     "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1"
   }
 }

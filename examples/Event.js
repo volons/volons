@@ -7,7 +7,7 @@ async function main() {
 
     // data store telemetries for all connected drones
     hive.on( 'telemetry', ( data ) => {
-        Object.keys( data ).forEach( uav => { 
+        Object.keys( data ).forEach( ( uav ) => {
             console.log( uav, data[ uav ] );
         } );
         // should print telemetry for 'dev' drone:

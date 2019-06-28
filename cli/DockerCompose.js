@@ -1,21 +1,12 @@
 // Volons DockerCompose.js
 // =======================
-// This class map docker-compose structure to 
+// This class map docker-compose structure to
 // store services, network and configuration and
 // generate YML docker-compose file into volons npm global directory
-//
-// TODO:
-// - upload images on dockerhub and update DBP ( Docker Build Path ).
-// - check concurrential binding port when running 2 or more docker-compose at the same time.
-// - check network services properties options
 
 const YAML = require( 'json2yaml' );
+const { Hive, Simulator, Px4 } = require( 'ContainerService.js' );
 
-const _DOCKER_HUB_IMAGE_VEHICLE_MAVLINK_ = 'volons/vehicle-mavlink';
-const _DOCKER_HUB_IMAGE_SIMULATOR_ = 'volons/simulator';
-const _DOCKER_HUB_IMAGE_HIVE_ = 'volons/hive';
-
-const _DEFAULT_GMAP_API_KEY_ = '__OBSOLETE__';
 
 class DockerCompose {
     constructor( filePath, subnetIpInc ) {
@@ -47,9 +38,13 @@ class DockerCompose {
     }
 
     // kind of private method to addService
-    _addService( name, service ) { this.services[ name ] = service; }
+    _addService( name, service ) {
+        this.services[ name ] = service;
+    }
 
-    _getService( serviceName ) { return this.services[ serviceName ] ? this.services[ serviceName ] : null; }
+    _getService( serviceName ) {
+        return this.services[ serviceName ] || null;
+    }
 
     _setEnv( serviceName, key, value ) {
         const service = this._getService( serviceName );
@@ -61,12 +56,11 @@ class DockerCompose {
             service.environment = [];
         }
         let updateEnv = false;
-        service.environment.forEach(  ( env ) => {
+        service.environment.forEach( ( env ) => {
             if ( env.split( '=' )[ 0 ] === key ) {
                 // update value
                 env = `${ key }=${ value }`;
                 updateEnv = true;
-                return;
             }
         } );
         // new env
@@ -77,19 +71,16 @@ class DockerCompose {
     // end privates methods
 
     init( token ) {
-        this._addService( 'fms', new Hive( this.fmsIp, token ) );
-        this._addService( 'simulator', new Simulator( this.simulatorIp ) );
+        const hive = new Hive( this.fmsIp, token );
+        const sim = new Simulator( this.simulatorIp );
+        this._addService( 'fms', hive );
+        this._addService( 'simulator', sim );
     }
 
     setDefaultHomePosition( latitude, longitude, altitude ) {
         this._setEnv( 'simulator', 'PX4_HOME_LAT', latitude );
         this._setEnv( 'simulator', 'PX4_HOME_LON', longitude );
         this._setEnv( 'simulator', 'PX4_HOME_ALT', altitude );
-    }
-
-    setDefaultGoogleMapAPIkey() {
-        this.useDefaultGmapAPIKey = true;
-        this._setEnv( 'fms', 'GMAP_API_KEY', _DEFAULT_GMAP_API_KEY_ );
     }
 
     setGMapApiKey( apiKey ) {
@@ -107,16 +98,14 @@ class DockerCompose {
 
     addDrone( name ) {
         // generate next px4 and vehicle-mavlink containers' IPAdress
-        const px4Ends = this.droneStartIp + ( this.droneCount * 2 );
+        const px4Ends = this.droneStartIp + this.droneCount * 2;
         const vehicleName = name.trim().toLowerCase().split( ' ' ).join( '-' );
-        const vehicleEnds = this.droneStartIp + ( ( this.droneCount * 2 ) + 1 );
+        const vehicleEnds = this.droneStartIp + this.droneCount * 2 + 1;
         const px4Ip = this.dronePrefixIp + px4Ends.toString();
         const vehicleIp = this.dronePrefixIp + vehicleEnds.toString();
         const px4Name = 'px4-' + this.droneCount.toString();
 
-        this._addService( px4Name, new Px4(
-            px4Ip,
-            this.simulatorIp ) );
+        this._addService( px4Name, new Px4( px4Ip, this.simulatorIp ) );
         this._addService( 'vehicle-mavlink-' + this.droneCount.toString(), new VehicleMavLink(
             vehicleName,
             vehicleIp,
@@ -137,55 +126,5 @@ class DockerCompose {
     }
 }
 
-class ContainerService {
-    constructor( ip, env, image ) {
-        this.networks = {
-            volons: {
-                ipv4_address: ip
-            }
-        };
-        if ( env ) {
-            this.environment = env;
-        }
-        if ( image ) {
-            this.image = image;
-        }
-    }
-}
-
-class VehicleMavLink extends ContainerService {
-    constructor( vehicleName, vehicleIp, px4Name, px4Ip, fmsIp ) {
-        super( vehicleIp, {
-            FMS_IP: fmsIp,
-            VEHICLE_NAME: vehicleName
-        }, _DOCKER_HUB_IMAGE_VEHICLE_MAVLINK_ );
-        this.depends_on = [ px4Name ];
-    }
-}
-
-class Px4 extends ContainerService {
-    constructor( px4Ip, simulatorIp ) {
-        super( px4Ip, {
-            SIMULATOR_IP: simulatorIp
-        },  _DOCKER_HUB_SIMULATOR_ );
-        this.depends_on = [ 'simulator' ];
-    }
-}
-
-class Simulator extends ContainerService {
-    constructor( ip ) {
-        super( ip );
-        this.image = 'volons/gazebo';
-        this.depends_on = [ 'fms' ];
-    }
-}
-
-class Hive extends ContainerService {
-    constructor( ip, token ) {
-        super( ip, [ `ADMIN_TOKEN=${ token }` ] );
-        //this.ports = [ '8081:8081' ];
-        this.image = _DOCKER_HUB_IMAGE_HIVE_;
-    }
-}
 
 module.exports = DockerCompose;

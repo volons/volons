@@ -1,12 +1,14 @@
-
+/* eslint-disable no-sync */
 const YAML = require( 'json2yaml' );
-const crypto = require( 'crypto' );
 const exec = require( 'executive' );
 const fs = require( 'fs' );
 
 const p = require( './Print.js' );
 
-const x = function( command ) { return exec.quiet( command, { sync: true } ); };
+const x = function( command ) {
+    return exec.quiet( command, { sync: true } );
+};
+
 const _DATASTORE_FILENAME_ = 'datastore.json';
 
 class Store {
@@ -14,9 +16,8 @@ class Store {
         this.dataFile = `${ x( 'npm -g root' ).stdout.trim() }/volons/cli/volons-cli/${ _DATASTORE_FILENAME_ }`;
         if ( fs.existsSync( this.dataFile ) ) {
             this._load();
-        }
-        else {
-           this._initStore();
+        } else {
+            this._initStore();
         }
     }
 
@@ -33,7 +34,7 @@ class Store {
         try {
             fileStr = fs.readFileSync( this.dataFile );
         } catch ( exception ) {
-            p.error( `Error: Loadding DataStore File: $( this.dataFile )`, exception );
+            p.error( `Error: Loadding DataStore File: ${ this.dataFile }`, exception );
             return false;
         }
 
@@ -58,7 +59,7 @@ class Store {
         try {
             storeStr = JSON.stringify( this.store, null, 2 );
         } catch ( exception ) {
-            p.error( `Error: Cannot serialize DataStore`, exception );
+            p.error( 'Error: Cannot serialize DataStore', exception );
             return false;
         }
 
@@ -85,7 +86,7 @@ class Store {
 
     _get( key ) {
         if ( !this.store ) {
-            throw `Cannont get key: ${ key }. DataStore: ${ this.dataFile } is undefined.`;
+            throw new Error( `Cannont get key: ${ key }. DataStore: ${ this.dataFile } is undefined.` );
         }
 
         const keyInStore = Object.keys( this.store ).filter( ( path ) => path === key );
@@ -93,7 +94,7 @@ class Store {
             return this.store[ keyInStore ];
         }
 
-        throw `Key: ${ key } is undefined in DataStore: ${ this.dataFile }.`;
+        throw new Error( `Key: ${ key } is undefined in DataStore: ${ this.dataFile }.` );
     }
 
     removeDockerCompose( dockerComposeId ) {
@@ -101,13 +102,12 @@ class Store {
             return false;
         }
 
-        const selectedDockerCompose = this.store.dockerComposes.filter( ( dc ) => dc.id == dockerComposeId );
+        const selectedDockerCompose = this.store.dockerComposes.filter( ( dc ) => dc.id === dockerComposeId );
 
-        if ( selectedDockerCompose && selectedDockerCompose.length == 1 ) {
+        if ( selectedDockerCompose && selectedDockerCompose.length === 1 ) {
             try {
                 fs.unlinkSync( selectedDockerCompose[ 0 ].filePath );
-            }
-            catch ( exception ) {
+            } catch ( exception ) {
                 p.warn( `Cannot delete docker-compose.yml: ${ selectedDockerCompose[ 0 ].filePath }. ${ exception }` );
             }
             this.store.dockerComposes = this.store.dockerComposes.filter( ( dc ) => dc.id !== dockerComposeId );
@@ -118,14 +118,16 @@ class Store {
     }
 
     addDockerCompose( dockerCompose ) {
-        this.store.dockerComposes = this.store.dockerComposes.filter( dc => dc.filePath !== dockerCompose.filePath );
-        dockerCompose.id = crypto.randomBytes( 8 ).toString('hex');
+        this.store.dockerComposes = this.store.dockerComposes.filter( ( dc ) => dc.filePath !== dockerCompose.filePath );
+        dockerCompose.id = Math.random().toString( 36 ).substr( 2 );
+        // generate random string Ex.: 'zeru01hz1bb'
         this.store.dockerComposes.push( dockerCompose );
         return this._save();
     }
 
     getSubnetIpInc( filePath ) {
-        const currentDockerCompose = this.store.dockerComposes.filter( dc => dc.filePath === filePath );
+        const currentDockerCompose = this.store.dockerComposes.filter( ( dc ) => dc.filePath === filePath );
+
         if ( currentDockerCompose.lenght === 1 ) {
             return currentDockerCompose[ 0 ].subnetIpInc;
         }
@@ -134,13 +136,13 @@ class Store {
     }
 
     list() {
-        if ( this.store.dockerComposes.length == 0 ) {
+        if ( this.store.dockerComposes.length === 0 ) {
             return 'Projet list is empty. To create a first project run: `volons init`.\n';
         }
 
         const list = {};
 
-        this.store.dockerComposes.forEach( dc => {
+        this.store.dockerComposes.forEach( ( dc ) => {
             list[ `Project [${ dc.id }]` ] = {
                 'Id': dc.id,
                 'Directory': dc.filePath,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const useColor = process.stdout.isTTY ? true : false;
 
 // from https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
@@ -78,3 +79,4 @@ class Print {
 }
 
 module.exports = new Print();
+/* eslint-enable */
