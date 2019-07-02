@@ -4,15 +4,27 @@ async function main() {
     let hive = new Hive('ws://localhost:8656/admin');
     await hive.connect();
 
-    console.log('connected to hive');
+    console.log(' -- connected to hive');
 
     let vehicle = hive.vehicle('dev');
     await vehicle.connect();
-    console.log('connected to vehicle');
+    console.log(' -- connected to vehicle');
 
-    console.log('takeoff');
+    let updState = null;
+    hive.on('telemetry', data => {
+        if (data.dev.status.armed !== updState) {
+            if (data.dev.status.armed) {
+                console.log('State: Armed!');
+            } else {
+                console.log('State: Disarmed');
+            }
+            updState = data.dev.status.armed;
+        }
+    });
+
+    console.log('Command: takeoff');
     await vehicle.takeoff();
-    console.log('in air');
+    console.log('State: In the Air');
 
     const wp = [
         { lat: -35.363607, lon: 149.16468, relAlt: 20 },
@@ -24,14 +36,14 @@ async function main() {
     ];
 
     for (let i = 0; i < wp.length; i++) {
+        console.log(`Command: goto() #${i}`, wp[i]);
         await vehicle.goto(wp[i].lat, wp[i].lon, wp[i].relAlt);
-        console.log(`arrived at waypoint: ${i}`);
+        console.log(`State: Arrived at #${i}`);
     }
 
-    console.log('returning home');
+    console.log('Command: rtl()');
     await vehicle.rtl();
-
-    console.log('landed');
+    console.log('State: Landing...');
 }
 
 main().catch(err => console.error(err));
