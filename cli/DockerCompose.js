@@ -4,19 +4,18 @@
 // store services, network and configuration and
 // generate YML docker-compose file into volons npm global directory
 
-const YAML = require( 'json2yaml' );
-const { Hive, Simulator } = require( 'ContainerService.js' );
-
+const YAML = require('json2yaml');
+const { Hive, Simulator } = require('ContainerService.js');
 
 class DockerCompose {
-    constructor( filePath, subnetIpInc ) {
+    constructor(filePath, subnetIpInc) {
         this.version = '3';
         this.networks = {
             volons: {
                 ipam: {
-                    config: [ { subnet: '172.' + subnetIpInc + '.0.0/24' } ]
-                }
-            }
+                    config: [{ subnet: '172.' + subnetIpInc + '.0.0/24' }],
+                },
+            },
         };
         this.services = {};
 
@@ -38,59 +37,64 @@ class DockerCompose {
     }
 
     // kind of private method to addService
-    _addService( name, service ) {
-        this.services[ name ] = service;
+    _addService(name, service) {
+        this.services[name] = service;
     }
 
-    _getService( serviceName ) {
-        return this.services[ serviceName ] || null;
+    _getService(serviceName) {
+        return this.services[serviceName] || null;
     }
 
-    _setEnv( serviceName, key, value ) {
-        const service = this._getService( serviceName );
-        if ( service === null ) {
+    _setEnv(serviceName, key, value) {
+        const service = this._getService(serviceName);
+        if (service === null) {
             // service is undefined
             return null;
         }
-        if ( !service.environment ) {
+        if (!service.environment) {
             service.environment = [];
         }
         let updateEnv = false;
-        service.environment.forEach( ( env ) => {
-            if ( env.split( '=' )[ 0 ] === key ) {
+        service.environment.forEach(env => {
+            if (env.split('=')[0] === key) {
                 // update value
-                env = `${ key }=${ value }`;
+                env = `${key}=${value}`;
                 updateEnv = true;
             }
-        } );
+        });
         // new env
-        if ( !updateEnv ) {
-            service.environment.push( `${ key }=${ value }` );
+        if (!updateEnv) {
+            service.environment.push(`${key}=${value}`);
         }
     }
     // end privates methods
 
-    init( token ) {
-        const hive = new Hive( this.fmsIp, token );
-        const sim = new Simulator( this.simulatorIp );
-        this._addService( 'fms', hive );
-        this._addService( 'simulator', sim );
+    init(token) {
+        const hive = new Hive(this.fmsIp, token);
+        const sim = new Simulator(this.simulatorIp);
+        this._addService('fms', hive);
+        this._addService('simulator', sim);
     }
 
-    setDefaultHomePosition( latitude, longitude, altitude ) {
-        this._setEnv( 'simulator', 'PX4_HOME_LAT', latitude );
-        this._setEnv( 'simulator', 'PX4_HOME_LON', longitude );
-        this._setEnv( 'simulator', 'PX4_HOME_ALT', altitude );
+    setDefaultHomePosition(latitude, longitude, altitude) {
+        this._setEnv('simulator', 'PX4_HOME_LAT', latitude);
+        this._setEnv('simulator', 'PX4_HOME_LON', longitude);
+        this._setEnv('simulator', 'PX4_HOME_ALT', altitude);
     }
 
-    setGMapApiKey( apiKey ) {
+    setGMapApiKey(apiKey) {
         this.useDefaultGmapAPIKey = false;
-        this._setEnv( 'fms', 'GMAP_API_KEY', apiKey );
+        this._setEnv('fms', 'GMAP_API_KEY', apiKey);
     }
 
-    getIPAddress( serviceName ) {
-        const service = this._getService( serviceName );
-        if ( service && service.networks && service.networks.volons && service.networks.volons.ipv4_address ) {
+    getIPAddress(serviceName) {
+        const service = this._getService(serviceName);
+        if (
+            service &&
+            service.networks &&
+            service.networks.volons &&
+            service.networks.volons.ipv4_address
+        ) {
             return service.networks.volons.ipv4_address;
         }
         return undefined;
@@ -118,13 +122,12 @@ class DockerCompose {
     // }
 
     toYML() {
-        return YAML.stringify( {
+        return YAML.stringify({
             version: this.version,
             networks: this.networks,
-            services: this.services
-        } );
+            services: this.services,
+        });
     }
 }
-
 
 module.exports = DockerCompose;

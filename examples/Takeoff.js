@@ -16,4 +16,4 @@ async function main() {
     console.log('in air');
 }
 
-main().catch((err) => console.error(err));
+main().catch(err => console.error(err));

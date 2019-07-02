@@ -6,10 +6,10 @@ const main = async function() {
     console.log('connected to hive');
 
     // data store telemetries for all connected drones
-    hive.on( 'telemetry', ( data ) => {
-        Object.keys( data ).forEach( ( uav ) => {
-            console.log( uav, data[ uav ] );
-        } );
+    hive.on('telemetry', data => {
+        Object.keys(data).forEach(uav => {
+            console.log(uav, data[uav]);
+        });
         // should print telemetry for 'dev' drone:
         // {
         //     status: { armed: true },
@@ -31,7 +31,7 @@ const main = async function() {
         //     }
         // }
         // ... every 800ms
-    } );
-}
+    });
+};
 
-main().catch((err) => console.error(err));
+main().catch(err => console.error(err));
