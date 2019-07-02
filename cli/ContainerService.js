@@ -1,4 +1,5 @@
 const _DOCKER_HUB_IMAGE_VEHICLE_MAVLINK_ = 'volons/vehicle-mavlink';
+const _DOCKER_HUB_IMAGE_SIMULATOR_ = 'volons/simulator';
 const _DOCKER_HUB_IMAGE_HIVE_ = 'volons/hive';
 
 class ContainerService {
@@ -17,7 +18,7 @@ class ContainerService {
     }
 }
 
-class VehicleMavLink extends ContainerService {
+class VehicleMAVLink extends ContainerService {
     constructor( vehicleName, vehicleIp, px4Name, px4Ip, fmsIp ) {
         super( vehicleIp, {
             FMS_IP: fmsIp,
@@ -27,20 +28,10 @@ class VehicleMavLink extends ContainerService {
     }
 }
 
-class Px4 extends ContainerService {
-    constructor( px4Ip, simulatorIp ) {
-        super( px4Ip, {
-            SIMULATOR_IP: simulatorIp
-        }, _DOCKER_HUB_SIMULATOR_ );
-        this.depends_on = [ 'simulator' ];
-    }
-}
-
 class Simulator extends ContainerService {
     constructor( ip ) {
-        super( ip );
-        this.image = 'volons/gazebo';
-        this.depends_on = [ 'fms' ];
+        super( ip, {}, _DOCKER_HUB_IMAGE_SIMULATOR_ );
+        this.depends_on = [ 'hive' ];
     }
 }
 
@@ -52,4 +43,4 @@ class Hive extends ContainerService {
     }
 }
 
-module.exports = { VehicleMavLink, Px4, Simulator, Hive };
+module.exports = { VehicleMAVLink, Simulator, Hive };

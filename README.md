@@ -5,6 +5,7 @@
     </a>
     <img src='https://img.shields.io/github/license/volons/volons.svg'>
     <img src='https://img.shields.io/github/last-commit/volons/volons.svg'>
+    <img src='https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=round-square'>
 </p>
 
 __Volons is still early access alpha software, use at your own risk.__

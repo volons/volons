@@ -5,7 +5,7 @@
 // generate YML docker-compose file into volons npm global directory
 
 const YAML = require( 'json2yaml' );
-const { Hive, Simulator, Px4 } = require( 'ContainerService.js' );
+const { Hive, Simulator } = require( 'ContainerService.js' );
 
 
 class DockerCompose {
@@ -96,26 +96,26 @@ class DockerCompose {
         return undefined;
     }
 
-    addDrone( name ) {
-        // generate next px4 and vehicle-mavlink containers' IPAdress
-        const px4Ends = this.droneStartIp + this.droneCount * 2;
-        const vehicleName = name.trim().toLowerCase().split( ' ' ).join( '-' );
-        const vehicleEnds = this.droneStartIp + this.droneCount * 2 + 1;
-        const px4Ip = this.dronePrefixIp + px4Ends.toString();
-        const vehicleIp = this.dronePrefixIp + vehicleEnds.toString();
-        const px4Name = 'px4-' + this.droneCount.toString();
+    // addDrone( name ) {
+    //     generate next px4 and vehicle-mavlink containers' IPAdress
+    //     const px4Ends = this.droneStartIp + this.droneCount * 2;
+    //     const vehicleName = name.trim().toLowerCase().split( ' ' ).join( '-' );
+    //     const vehicleEnds = this.droneStartIp + this.droneCount * 2 + 1;
+    //     const px4Ip = this.dronePrefixIp + px4Ends.toString();
+    //     const vehicleIp = this.dronePrefixIp + vehicleEnds.toString();
+    //     const px4Name = 'px4-' + this.droneCount.toString();
 
-        this._addService( px4Name, new Px4( px4Ip, this.simulatorIp ) );
-        this._addService( 'vehicle-mavlink-' + this.droneCount.toString(), new VehicleMavLink(
-            vehicleName,
-            vehicleIp,
-            px4Name,
-            px4Ip,
-            this.fms_ip
-        ) );
+    //     this._addService( px4Name, new ( px4Ip, this.simulatorIp ) );
+    //     this._addService( 'vehicle-mavlink-' + this.droneCount.toString(), new VehicleMAVLink(
+    //         vehicleName,
+    //         vehicleIp,
+    //         px4Name,
+    //         px4Ip,
+    //         this.fms_ip
+    //     ) );
 
-        this.droneCount++;
-    }
+    //     this.droneCount++;
+    // }
 
     toYML() {
         return YAML.stringify( {

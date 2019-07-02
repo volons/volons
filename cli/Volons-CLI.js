@@ -13,6 +13,8 @@
 // - docker
 // - docker-compose
 
+/*eslint no-sync: ["error", { allowAtRootLevel: true }]*/
+
 const exec = require( 'executive' );
 const fs = require( 'fs' );
 const YAML = require( 'json2yaml' );
@@ -45,32 +47,36 @@ let stepNumber = 1;
 // store docker-compose.yml path
 let dockerFilePath = '';
 // is using global npm directory CLI option '-g'
-let useGlobalDir = true; // default
+let useGlobalDir = true;
 
-const initSequence = function( entryVal, dockerCompose, droneCounter ) {
-    let adminToken = Math.random().toString(36).substr(2); // Generate random ID string (like 'qs8x53qb3u')
+const initSequence = function( entryVal, cd, droneCounter ) {
+    // Generate random ID string (like 'qs8x53qb3u')
+    let adminToken = Math.random().toString(36).substr(2);
 
     if ( entryVal === '' ) {
-        p.info( `Create Volons configuration with generated token:` );
+        p.info( 'Create Volons configuration with generated token:' );
     } else {
         adminToken = entryVal;
-        p.info( `Create Volons configuration with your custom token:` );
+        p.info( 'Create Volons configuration with your custom token:' );
     }
 
     p.info( adminToken );
     p.warn( '/!\\ You should save this token to connect the hive.' );
 
-    dockerCompose.init( adminToken );
+    cd.init( adminToken );
 
     p.logNoCR( `\n${ stepNumber++ }: Add a first drone to the simulator, enter drone name or press enter to use: 'drone-${ droneCounter }': ` );
 
     return 'ADD_DRONE';
 };
 
-const addDroneSequence = function( entryVal, dockerCompose, droneCounter ) {
-    const newDroneName = ( entryVal === '' ) ? `drone-${ droneCounter }` : entryVal;
+const addDroneSequence = function( entryVal, cd, droneCounter ) {
+    let newDroneName = `drone-${ droneCounter }`;
+    if ( entryVal !== '' ) {
+        newDroneName = entryVal;
+    }
 
-    dockerCompose.addDrone( newDroneName );
+    cd.addDrone( newDroneName );
 
     p.info( `New drone: ${ newDroneName } has been added to simulator.` );
 
@@ -83,7 +89,7 @@ const addDroneSequence = function( entryVal, dockerCompose, droneCounter ) {
     return 'HOME_POSITION';
 };
 
-const droneNameSequence = function( entryVal, dockerCompose, droneCounter ) {
+const droneNameSequence = function( entryVal, cd, droneCounter ) {
     if ( entryVal === '' || entryVal.toLowerCase() === 'yes' || entryVal.toLowerCase() === 'y' ) {
         p.logNoCR( `\n${ stepNumber++ }: Add a new drone to the simulator, enter drone name or press enter to use: 'drone-${ droneCounter }': ` );
         return 'ADD_DRONE';
@@ -147,20 +153,27 @@ const init = function() {
 
     p.logNoCR( `${ stepNumber++ }: Enter your token or press enter to generate new token: ` );
 
-    let sequence = 'INIT';
+    // let sequence = 'INIT';
+    let sequence = '_NONE_';
     let droneCounter = 1;
 
     stdin.addListener( 'data', function( d ) {
         const entryVal = d.toString().trim();
 
         switch ( sequence ) {
-            // case 'INIT' : sequence = initSequence( entryVal, dockerCompose, droneCounter ); break;
-            case 'ADD_DRONE': sequence = addDroneSequence( entryVal, dockerCompose, droneCounter ); break;
-            case 'DRONE_NAME': sequence = droneNameSequence( entryVal, dockerCompose, droneCounter ); break;
-            case 'HOME_POSITION': sequence = homePositionSequence( entryVal ); break;
-            case 'USE_GMAP': sequence = useGMapSequence( entryVal ); break;
-            case 'GMAP_API_KEY': sequence = saveGMapAPIKeySequence( entryVal, dockerCompose ); break;
-            default: break;
+        case 'INIT': sequence = initSequence( entryVal, dockerCompose, droneCounter );
+            break;
+        case 'ADD_DRONE': sequence = addDroneSequence( entryVal, dockerCompose, droneCounter );
+            break;
+        case 'DRONE_NAME': sequence = droneNameSequence( entryVal, dockerCompose, droneCounter );
+            break;
+        case 'HOME_POSITION': sequence = homePositionSequence( entryVal );
+            break;
+        case 'USE_GMAP': sequence = useGMapSequence( entryVal );
+            break;
+        case 'GMAP_API_KEY': sequence = saveGMapAPIKeySequence( entryVal, dockerCompose );
+            break;
+        default: break;
         }
 
         if ( sequence === 'END' ) {
@@ -169,9 +182,10 @@ const init = function() {
             p.info( '\n\nVolons\' containers have been configured.' );
             p.log( `The ${ _DOCKER_COMPOSE_FILENAME_ } file has been saved to` );
             p.log( `${ dockerFilePath }${ _DOCKER_COMPOSE_FILENAME_ }\n` );
-            const msgGlobal = '';
-            if ( useGlobalDir )
+            let msgGlobal = '';
+            if ( useGlobalDir ) {
                 msgGlobal = '-g';
+            }
             p.log( `Next: to start Volons' docker containers run \`volons start${ msgGlobal }\`.\n` );
 
             fs.writeFileSync( `${ dockerFilePath }${ _DOCKER_COMPOSE_FILENAME_ }`, dockerCompose.toYML() );
@@ -183,22 +197,31 @@ const init = function() {
 // function to start docker containers
 const start = function() {
     printHelp( 'start.txt' );
-    let stderr = x( `docker ps` ).stderr;
+    let stderr = x( 'docker ps' ).stderr;
     // check if docker is installed and docker deamon is runing
     if ( stderr ) {
-        p.error( 'Error: Cannot run Docker command: \`docker ps\`. ', stderr );
+        p.error( 'Error: Cannot run Docker command: `docker ps`. ', stderr );
     } else {
         // docker deamon is runing
-        // TODO
         // Check if current docker-compose is allready started before.
         // let { stdout, stderr } = x( `docker inspect -f {{.State.Running}} volons-cli_fms_1` );
         // if ( stderr || stdout.trim() === 'false' ) {
         p.warn( 'Entering docker-compose console (Press CTRL+C to kill all process)\n' );
 
-        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } up`, err => { process.exit( 0 ); } );
+        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } up`, ( err ) => {
+            if ( err ) {
+                p.error( 'Error: Cannot execute Docker-compose command.', err );
+                throw err;
+            }
+        } );
         // forward CTRL-C to docker-compose
         process.on('SIGINT', function () {
-            exec.interactive( `cd ${ dockerFilePath };docker-compose kill -f ${ _DOCKER_COMPOSE_FILENAME_ } -s SIGINT`, err => { process.exit( 0 ); } );
+            exec.interactive( `cd ${ dockerFilePath };docker-compose kill -f ${ _DOCKER_COMPOSE_FILENAME_ } -s SIGINT`, ( err ) => {
+                if ( err ) {
+                    p.error( 'Error: Cannot execute Docker-compose command.', err );
+                    throw err;
+                }
+            } );
         });
         // } else {
         //     p.info( 'Volons is already runing.' );
@@ -209,26 +232,31 @@ const start = function() {
 
 const pull = function() {
     printHelp( 'pull.txt' );
-    let stderr = x( `docker ps` ).stderr;
+    let stderr = x( 'docker ps' ).stderr;
     // check if docker is installed and docker deamon is runing
     if ( stderr ) {
-        p.error( 'Error: Cannot run Docker command: \`docker ps\`. ', stderr );
+        p.error( 'Error: Cannot run Docker command: `docker ps`. ', stderr );
     } else {
-        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } pull`, err => { process.exit( 0 ); } );
+        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } pull`, ( err ) => {
+            if ( err ) {
+                p.error( 'Error: Cannot execute Docker-compose command.', err );
+                throw err;
+            }
+        } );
     }
 };
 const stop = function() {
     printHelp( 'stop.txt' );
-    let stderr = x( `docker ps` ).stderr;
+    let stderr = x( 'docker ps' ).stderr;
     // check if docker is installed and docker deamon is runing
     if ( stderr ) {
-        console.log( 'Error: Cannot run Docker command: \`docker ps\`. ', stderr );
+        p.error( 'Error: Cannot run Docker command: `docker ps`. ', stderr );
     } else {
-        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } kill -s SIGINT`, err => {
+        exec.interactive( `cd ${ dockerFilePath };docker-compose -f ${ _DOCKER_COMPOSE_FILENAME_ } kill -s SIGINT`, ( err ) => {
             if ( err ) {
                 p.error( 'Error: No Volons\' container is running.', err );
+                throw err;
             }
-            process.exit( 0 );
         } );
     }
 };
@@ -236,10 +264,14 @@ const stop = function() {
 // Open web browser with monitor url
 const monitor = function() {
 
-    const monitorUrl = `http://${ dockerCompose.getIPAddress( 'fms' ) }:8181/`;
-
-        console.log( `Fleet Management System Monitor URL: ${ monitorUrl }` );
-    exec.interactive( `open ${ monitorUrl }`, err => { process.exit( 0 ); } );
+    const monitorUrl = `http://${ dockerCompose.getIPAddress( 'hive' ) }:8181/`;
+    console.log( `Monitor URL: ${ monitorUrl }` );
+    exec.interactive( `open ${ monitorUrl }`, ( err ) => {
+        if ( err ) {
+            p.error( 'Error: Cannot execute open command.', err );
+            throw err;
+        }
+    } );
 };
 
 const ls = function() {
@@ -266,7 +298,7 @@ const rm = function( args ) {
 
 const ps = function() {
     // docker-compose ps
-    const dockerPsCmd = exec.quiet( `docker-compose -f ${ dockerFilePath }${ _DOCKER_COMPOSE_FILENAME_ } ps`, ( err, stdout, stderr ) => {
+    exec.quiet( `docker-compose -f ${ dockerFilePath }${ _DOCKER_COMPOSE_FILENAME_ } ps`, ( stdout, stderr ) => {
 
         if ( stderr ) {
             printHelp( 'ps.txt' );
@@ -291,24 +323,23 @@ const ps = function() {
         allVolonsContainers.forEach( ( proc ) => {
             const procName = proc.split( ' ' )[ 0 ];
 
-            console.log( `&&${ proc.split( ' ' )[ 0 ] }&&` );
-
             const dockerInspect = x( `docker inspect ${ procName }` );
             if ( dockerInspect.stderr ) {
                 p.error( '`Error: Cannot execute `docker inspect`.', dockerInspect.stderr );
                 return;
             }
             let inspect = {};
-            try { 
+            try {
                 inspect = JSON.parse( dockerInspect.stdout )[ 0 ];
             } catch ( execption ) {
                 p.error( 'Error: Cannot JSON.parse `docker inspect` result.', execption );
                 return;
             }
 
-            const processInfo = info[ `${ counter++ }/ ${ procName }` ] = {
+            info[ `${ counter++ }/ ${ procName }` ] = {
                 'Name': procName
             };
+            const processInfo = info[ `${ counter++ }/ ${ procName }` ];
 
             if ( inspect.State && inspect.State.Status ) {
                 processInfo.State = inspect.State.Status;
@@ -349,7 +380,7 @@ const ps = function() {
     } );
 };
 
-// get args parameters 
+// get args parameters
 // 2 first eleems are paths
 const args = process.argv.slice(2);
 
@@ -362,18 +393,27 @@ if ( args.length === 0 ) {
     dockerCompose = new DockerCompose( dockerFilePath + _DOCKER_COMPOSE_FILENAME_, store.getSubnetIpInc( dockerFilePath ) );
 
     switch ( args[ 0 ].toLowerCase() ) {
-        case 'help': printHelp( 'help.txt' ); break;
-        case 'start': start(); break;
-        case 'stop': stop(); break;
-        case 'pull': pull(); break;
-        case 'init': init(); break;
-        case 'monitor': monitor(); break;
-        case 'ps': ps(); break;
-        case 'ls': ls(); break;
-        case 'rm': rm( args ); break;
-        default:
-            printHelp( 'help.txt' );
-            p.error( `Command "${ args[ 0 ] }" not found` );
-            break;
+    case 'help': printHelp( 'help.txt' );
+        break;
+    case 'start': start();
+        break;
+    case 'stop': stop();
+        break;
+    case 'pull': pull();
+        break;
+    case 'init': init();
+        break;
+    case 'monitor': monitor();
+        break;
+    case 'ps': ps();
+        break;
+    case 'ls': ls();
+        break;
+    case 'rm': rm( args );
+        break;
+    default:
+        printHelp( 'help.txt' );
+        p.error( `Command "${ args[ 0 ] }" not found` );
+        break;
     }
 }
