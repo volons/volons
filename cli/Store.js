@@ -170,11 +170,11 @@ class Store {
 
         this.store.dockerComposes.forEach(dc => {
             list[`Project [${dc.id}]`] = {
-                Id: dc.id,
-                Directory: dc.filePath,
+                'Id': dc.id,
+                'Directory': dc.filePath,
                 'Network subnet': dc.networks.volons.ipam.config[0].subnet,
                 'Fleet Management System IP address': dc.fmsIp,
-                Token: dc.services.fms.environment[0].substring(12),
+                'Token': dc.services.fms.environment[0].substring(12),
             };
         });
 
